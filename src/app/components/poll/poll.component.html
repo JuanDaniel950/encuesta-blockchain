@@ -1,0 +1,16 @@
+<div class="card mb-4">
+  <div>
+    <img [src]="image" class="img-fluid" />
+  </div>
+  <div class="card-body">
+    <p class="card-text text-truncate fw-bold">
+      {{ question }}
+    </p>
+    <div class="d-flex justify-content-between">
+      <small class="text-muted"
+        >Votes: <strong> {{ numberOfVotes }}</strong>
+      </small>
+      <small *ngIf="voted" class="badge text-bg-primary"> Voted </small>
+    </div>
+  </div>
+</div>
