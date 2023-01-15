@@ -1,3 +1,4 @@
+import { PollBlockchainService } from './blockchain/poll-blockchain.service';
 import { PollService } from './services/poll.service';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -19,7 +20,7 @@ import { PollResultComponent } from './components/poll/poll-result/poll-result.c
     PollResultComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
-  providers: [PollService],
+  providers: [PollService, PollBlockchainService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

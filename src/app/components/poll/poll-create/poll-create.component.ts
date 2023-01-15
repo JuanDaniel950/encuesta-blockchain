@@ -1,3 +1,4 @@
+import { Contract } from 'web3-eth-contract';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PollService } from 'src/app/services/poll.service';
