@@ -11,8 +11,13 @@ import { Component } from '@angular/core';
 export class AppComponent {
   showForm = false;
   activePoll: any = null;
-  polls = this.pollService.getPolls();
-  constructor(private pollService: PollService) {}
+
+  polls: Poll[] = [];
+
+  constructor(private pollService: PollService) {
+    const pollsito = this.pollService.getPolls();
+    console.log('pollsito', pollsito);
+  }
 
   selectPoll(poll: Poll) {
     this.activePoll = null;

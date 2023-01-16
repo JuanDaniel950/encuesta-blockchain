@@ -11,27 +11,21 @@ export class PollService {
 
   web3: Web3 = new Web3();
 
-  getPolls(): Observable<Poll[]> {
-    return of([
-      {
-        id: 1,
-        question: 'What is your favorite color?',
-        results: [90, 11, 22, 55, 31],
-        voted: true,
-        options: ['Red', 'Blue', 'Green', 'Yellow', 'Orange'],
-        thumbnail:
-          'https://s1.1zoom.me/big3/471/Painting_Art_Back_view_Photographer_575380_3840x2400.jpg',
-      },
-      {
-        id: 2,
-        question: 'What is your favorite Dog?',
-        results: [0, 1, 5, 7, 6],
-        voted: false,
-        options: ['Poodle', 'Labrador', 'Pug', 'Bulldog', 'Beagle'],
-        thumbnail:
-          'https://www.thesprucepets.com/thmb/ds_6QWZkIa6b0SE_kZaTgk4P8qY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-175928868-120f47906f4849969fcdab28e2e4f494.jpg',
-      },
-    ]).pipe(delay(2000));
+  async getPolls(): Promise<Poll[]> {
+    const totalPolls = await this.web3Service.call('getTotalPoll');
+    const polls: Poll[] = [];
+    const acc = await this.web3Service.getAccount();
+    const voter = await this.web3Service.call('getVoter', acc);
+
+    const voterNormalized = this.normalizeVoter(voter);
+
+    for (let i = 0; i < totalPolls; i++) {
+      const pollRaw = await this.web3Service.call('getPoll', i);
+      const pollNormalized = this.normalicePoll(pollRaw, voterNormalized);
+      polls.push(pollNormalized);
+    }
+
+    return polls;
   }
 
   vote(pollId: string, voteNumber: number) {
@@ -39,12 +33,29 @@ export class PollService {
   }
 
   createPoll(poll: pollForm) {
-    console.log('poll', poll);
     this.web3Service.executeTransaction(
       'createPoll',
       poll.question,
       poll.thumbnail || '',
       poll.options.map((option) => this.web3.utils.fromAscii(option))
     );
+  }
+  normalizeVoter(voter: any[]) {
+    return {
+      id: voter[0],
+      votedIds: voter[1].map((vote: any) => vote.toNumber()),
+    };
+  }
+  normalicePoll(poll: any[], voter: any): Poll {
+    return {
+      id: poll[0].toNumber(),
+      question: poll[1],
+      thumbnail: poll[2],
+      options: poll[4].map((option: any) =>
+        this.web3.utils.toAscii(option).replace(/\u0000/g, '')
+      ),
+      voted: voter.votedIds.includes(poll[0].toNumber()),
+      results: poll[3].map((result: any) => result.toNumber()),
+    };
   }
 }

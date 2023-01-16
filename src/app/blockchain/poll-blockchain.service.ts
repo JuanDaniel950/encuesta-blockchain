@@ -43,13 +43,16 @@ export class PollBlockchainService {
       .then((acccount: string[]) => acccount[0] || '');
   }
 
-  async executeTransaction(fnName: string, ...args: any): Promise<void> {
+  async executeTransaction(fnName: string, ...args: any[]): Promise<void> {
     const acc = await this.getAccount();
-
-    console.log('arrrr', ...args);
-
-    console.log('acc', acc);
     this.contract.methods[fnName](...args).send({
+      from: acc,
+    });
+  }
+
+  async call(fnName: string, ...args: any[]): Promise<any> {
+    const acc = await this.getAccount();
+    return this.contract.methods[fnName](...args).send({
       from: acc,
     });
   }
